@@ -1,0 +1,8 @@
+---
+
+# Install Strapi and all its dependencies on the provisioned EC2 instance
+ - hosts: strapis
+   remote_user: "{{ user }}"
+   become: yes
+   roles:
+   - strapi

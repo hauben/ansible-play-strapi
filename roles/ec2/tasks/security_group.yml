@@ -1,0 +1,21 @@
+# Create Strapis EC2 Security Group within the VPC 
+- name: Create a security group
+  ec2_group:
+    name: "{{ security_group_name }}"
+    tags:
+      Name: "{{ security_group_name }}"
+    description: "{{ security_group_description }}"
+    region: "{{ ec2_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    vpc_id: "{{ hostvars['localhost'].vpc.vpc.id }}"
+    rules:
+      - proto: tcp
+        ports:
+          - 22
+          - 1337
+          - 80
+          - 443
+        cidr_ip: 0.0.0.0/0
+  register: aws_sg_ec2
+      

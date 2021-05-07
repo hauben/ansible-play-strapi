@@ -1,0 +1,10 @@
+# defaults file for rds
+instance_name: Strapi-Backend-DB
+instance_type: db.t3.small
+db_size: 8
+minor_updates: true
+major_updates: false
+security_group_name_rds: "Security Group RDS PostgreSQL"
+security_group_description_rds: "Security Group RDS PostgreSQL"
+db_subnet_group_name: RDS Strapi Subnet Group
+db_subnet_group_description: Subnet Group for RDS

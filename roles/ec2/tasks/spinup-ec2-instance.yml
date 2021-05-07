@@ -1,0 +1,62 @@
+# Create an EC2 instance and put it into the previously created public subnet
+- name: Launch EC2 Instance
+  ec2:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    group_id: "{{ aws_sg_ec2.group_id }}"
+    vpc_subnet_id: "{{ hostvars['localhost'].public_subnet.subnet.id }}"
+    instance_type: "{{ ec2_instance_type }}"
+    image: "{{ image }}"
+    region: "{{ ec2_region }}"
+    keypair: "{{ keypair }}"
+    assign_public_ip: yes
+    state: present
+    wait: yes 
+  register: ec2
+
+
+# Give the EC2 instance a name
+- name: Add tag to Instance
+  ec2_tag:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    resource: "{{ ec2.instances[0].id }}" 
+    region: "{{ ec2_region }}" 
+    state: "present"
+    tags:
+      Type: strapi
+      Name: "{{ ec2_instance_name }}"
+
+
+# Wait for public ip address become to be available
+# Todo: Find a better way ;-)
+- name: Sleep for 10 seconds and continue with play - public IP of EC2 should be available by then
+  wait_for:
+    timeout: 10
+  delegate_to: localhost
+
+
+# Get the public IP address of the EC2 instance
+- name: Gather information about EC2 instance to extract public IP
+  community.aws.ec2_instance_info:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ ec2_region }}" 
+    instance_ids:
+      - "{{ ec2.instances[0].id }}"
+  register: ec2_instance_info    
+
+
+# Add the IP address to our group 
+- name: Add public IP of EC2 instance so that we can further connect to it
+  add_host:
+      name: "{{ ec2_instance_info.instances[0].public_ip_address }}"
+      groups: strapis
+
+
+# Finally wait that port 22 becomes available
+- name: Wait for SSH (port 22) to come up
+  wait_for:
+    host: "{{ ec2_instance_info.instances[0].public_ip_address }}"
+    port: 22 
+    state: started 

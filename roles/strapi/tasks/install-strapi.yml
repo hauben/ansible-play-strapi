@@ -1,0 +1,87 @@
+# Install the Strapi backend via creating a Strapi app
+- name: Install strapi via CLI
+  ansible.builtin.command: npx create-strapi-app {{ strapi_project_name }} --dbclient {{ db_engine }} --dbport {{ db_port }} --dbname {{ db_name }} --dbhost {{ hostvars['localhost'].rds.endpoint.address }} --dbusername {{ username }} --dbpassword {{ password }}
+  become: true
+  become_user: "{{ user }}"
+  args:
+    chdir: ~/
+  register: strapi_install_finished   
+
+
+# Read the generated server.js for further processing to get the generated JWT token
+- name: Read the generated ./config/server.js for further JWT token extraction
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.slurp:
+    src: ~/{{ strapi_project_name }}/config/server.js
+  register: serverfile
+
+
+# Extract the JWT token
+- name: Extract the JWT token for further processing - will be stored in .env
+  set_fact:
+    token: "{{ serverfile['content'] | b64decode | regex_findall(regex) | last }}"
+ 
+ 
+# Check if the token was extracted correctly 
+- name: Fail check if the token was extracted correctly
+  fail: msg="JWT Token is empty or undefined - check config/server.js"
+  when: token is not defined or token=="" 
+
+
+# Install the ASW S3 Upload provider
+# S3 can be used to store images which can be uploaded either by the backend or the frontend application
+- name: Install Strapi AWS S3 Upload Provider
+  become: true
+  become_user: "{{user}}"
+  npm: 
+    name: strapi-provider-upload-aws-s3
+    path: ~/{{ strapi_project_name }}
+
+
+# The hidden .env file is our major Strapi configuration. It holds variables and their content
+# used by other scripts like ./config/database.js, ./config/server.js, ./config/plugins.js
+# configure your strapi backend here
+- name: Copy Strapis env file to ./.env
+  become: true
+  become_user: "{{user}}"
+  template:
+    src: env.j2
+    dest: ~/{{ strapi_project_name }}/.env
+   
+
+# Copy Strapis server.js into config/server.js
+- name: Copy Strapis server settings to ./config/server.js
+  become: true
+  become_user: "{{user}}"
+  copy:
+    src: server.js
+    backup: yes
+    dest: ~/{{ strapi_project_name }}/config/server.js
+
+
+# Copy Strapis plugins.js into config/plugins.js
+- name: Copy Strapis plugins.js file for the S3 upload provider to ./config/plugins.js
+  become: true
+  become_user: "{{user}}"
+  copy:
+    src: plugins.js
+    dest: ~/{{ strapi_project_name }}/config/plugins.js
+
+
+# Copy Strapis database.js into config/database.js
+- name: Copy Strapi database settings to ./config/database.js
+  become: true
+  become_user: "{{user}}"
+  template:
+     src: database.js.j2
+     dest: ~/{{ strapi_project_name }}/config/database.js
+  
+
+# Finally build the admin panel
+- name: NODE | npm run build for the admin panel
+  become: yes
+  become_user: "{{user}}"
+  shell: npm run build
+  args:
+    chdir: ~/{{ strapi_project_name }}

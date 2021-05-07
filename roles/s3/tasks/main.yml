@@ -1,0 +1,12 @@
+---
+# tasks file for s3
+
+# Check first if credentials are set
+- assert:
+    that:
+       - aws_access_key != none
+       - aws_secret_key != none
+    fail_msg: You have to specify your credentials in /inventories/<stage>/group_vars/all/credentials.yml   
+
+
+- import_tasks: create_s3_bucket.yml

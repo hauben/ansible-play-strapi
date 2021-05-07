@@ -1,0 +1,35 @@
+# defaults file for vpc
+
+# Name of the VPC
+vpc_name: VPC-Strapi-Backend
+
+# IP CIDR block for the VPC
+vpc_cidr_block: 10.0.0.0/16
+
+# Name of the public subnet
+public_subnet_name: Public Subnet Strapi Deployment
+
+# Region of the public subnet
+public_subnet_az: "{{ vpc_region }}a"
+
+# IP CIDR block for the public subnet
+public_subnet_cidr_block: 10.0.4.0/24
+
+# Name of the VPCs Internet gateway
+internet_gateway_name: Strapi Deployment IGW
+
+# Name of the Route table
+routeTableName: rt-StrapiPublicSubnet
+
+# Private subnets for the RDS Database group
+vpc_private_subnets:
+  private-a:
+    cidr: 10.0.1.0/24
+    az: "{{ vpc_region }}a"
+  private-b:
+    cidr: 10.0.2.0/24
+    az: "{{ vpc_region }}b"
+  private-c:
+    cidr: 10.0.3.0/24
+    az: "{{ vpc_region }}c"
+  

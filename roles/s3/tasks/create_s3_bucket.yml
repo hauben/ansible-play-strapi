@@ -1,0 +1,13 @@
+# Create the S3 Bucket which can be used by the Strapi AWS Upload Plugin
+- amazon.aws.s3_bucket:
+    name: my-bucket-for-strapi
+    region: "{{ s3_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    public_access:
+        block_public_acls: false
+        block_public_policy: true
+        ignore_public_acls: false
+        restrict_public_buckets: true
+    state: present
+  register: bucket

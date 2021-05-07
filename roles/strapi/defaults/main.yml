@@ -1,0 +1,8 @@
+nodejs_version: "14.x"
+ansible_distribution_release: focal
+strapi_project_name: my-strapi-project
+strapi_host: localhost
+strapi_port: 1337
+strapi_app_name: my-strapi-app
+node_env: development
+strapi_run_args: run develop

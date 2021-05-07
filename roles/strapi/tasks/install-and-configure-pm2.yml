@@ -1,0 +1,29 @@
+# Install PM2 Runtime globaly
+- name: Install PM2 Runtime
+  npm: 
+    name: pm2
+    global: yes
+
+
+# Copy the PM2 ecosystem file to the home directory
+- name: Copy PM2 ecosystem.config.js to the users home directory ~/
+  become: true
+  become_user: "{{user}}"
+  template:
+    src: ecosystem.config.js.j2
+    dest: ~/ecosystem.config.js
+
+
+# Configure PM2 to start strapi on each system startup
+# Check afterwards manually with pm2 list to see if your strapi project was added correctly
+- name: Start Strapi via PM2
+  become_user: "{{user}}"
+  ansible.builtin.command: pm2 start ~/ecosystem.config.js
+
+- name: Configure PM2 to launch strapi on system startup
+  become: true   
+  ansible.builtin.command: env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u "{{user}}" --hp ~/
+
+- name: Save the PM2 process list and environment
+  become_user: "{{user}}"    
+  ansible.builtin.command: pm2 save

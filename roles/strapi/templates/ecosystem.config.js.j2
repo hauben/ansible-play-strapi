@@ -1,0 +1,13 @@
+module.exports = {
+    apps: [
+      {
+        name: "{{strapi_app_name}}",
+        cwd: "/home/{{user}}/{{strapi_project_name}}",
+        script: 'npm',
+        args: "{{strapi_run_args}}",
+        env: {
+          NODE_ENV: "{{node_env}}"
+        },
+      },
+    ],
+  }; 

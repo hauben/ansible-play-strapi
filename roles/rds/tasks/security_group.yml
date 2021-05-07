@@ -1,0 +1,21 @@
+# Create the RDS Security Group and place it into the private subnet of the created VPC
+- name: Create a security group for the RDS DB 
+  ec2_group:
+    name: "{{ security_group_name_rds }}"
+    vpc_id: "{{ hostvars['localhost'].vpc.vpc.id }}"
+    tags:
+      Name: "{{ security_group_name_rds }}"
+    description: "{{ security_group_description_rds }}"
+    region: "{{ rds_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    rules:
+      - proto: tcp
+        from_port: "{{ db_port }}"
+        to_port: "{{ db_port }}"
+        group_id: "{{ hostvars['localhost'].aws_sg_ec2.group_id }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+  register: aws_sg_rds
+   

@@ -1,0 +1,11 @@
+# defaults file for ec2
+security_group_description: "Security Group EC2 Strapi Backend"
+security_group_name: "Security Group EC2 Strapi Backend"
+
+ec2_instance_type: "t4g.small"
+ec2_instance_name: "Strapi Backend Instance"
+
+# Ubuntu Server 20.04 LTS (HVM), SSD Volume Type ARM
+# Check if this AMI is available in your desired AWS region
+image: ami-0b75998a97c952252
+keypair: EC2BackendKey

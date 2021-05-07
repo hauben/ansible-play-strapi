@@ -1,0 +1,19 @@
+---
+# EC2 Configuration Items
+ec2_region: "us-east-1"
+
+# RDS/ Strapi DB Configuration Items
+db_name: strapi
+db_port: 5432
+db_engine: postgres
+db_ssl_enabled: false
+rds_region: "us-east-1"
+
+# S3 Configuration Items
+s3_bucket_name: my-bucket-for-strapi
+s3_region: "us-east-1"
+
+# VPC Configuration Items
+vpc_region: "us-east-1"
+
+user: ubuntu

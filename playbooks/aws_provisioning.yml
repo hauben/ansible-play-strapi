@@ -1,0 +1,11 @@
+---
+# Play all the roles to provision everything on AWS
+# A VPC with private subnets for the RDS database and a public subnet for the Strapi instance running on EC2
+# Create a S3 bucket to use S3 for a destination to upload images
+
+ - hosts: localhost
+   roles:
+   - vpc
+   - ec2
+   - rds
+   - s3

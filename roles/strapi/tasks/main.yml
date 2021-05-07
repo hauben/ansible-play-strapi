@@ -1,0 +1,6 @@
+---
+# tasks file for strapi
+
+- import_tasks: strapi_preparation.yml
+- import_tasks: install-strapi.yml
+- import_tasks: install-and-configure-pm2.yml

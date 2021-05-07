@@ -1,0 +1,75 @@
+# Create the VPC
+- name: Create a VPC 
+  amazon.aws.ec2_vpc_net:
+    name: "{{ vpc_name }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    cidr_block: "{{ vpc_cidr_block }}"
+    region: "{{ vpc_region }}"
+  register: vpc
+
+
+# Create an Internet Gateway for the VPC 
+- name: Create internet gateway for the VPC
+  ec2_vpc_igw:
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      region: "{{ vpc_region }}"
+      vpc_id: "{{ vpc.vpc.id }}"
+      tags:
+        Name: "{{internet_gateway_name}}"     
+  register: vpc_igw
+
+
+# Create our private subnets for placing the RDS instance into
+- name: create VPC private subnets
+  ec2_vpc_subnet:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}" 
+    vpc_id: "{{ vpc.vpc.id }}"
+    cidr: "{{ item.value.cidr }}"
+    az: "{{ item.value.az }}"
+    tags:
+      Name: "{{ item.key }}"
+  with_dict: "{{ vpc_private_subnets }}"
+  register: private_subnets
+
+
+# Gather information about the private subnets
+- name: "Set facts for the private subnets"
+  set_fact:
+    vpc_subnet_ids: "{{ vpc_subnet_ids | default({}) | combine({ item.subnet.tags.Name: item.subnet.id }) }}"
+  loop: "{{ private_subnets.results }}"
+
+
+# Create a public subnet - in this subnet our Strapi EC2 instance will be placed
+- name: Create public subnet in AZ {{ public_subnet_az }}
+  ec2_vpc_subnet:
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      map_public: yes
+      cidr: "{{ public_subnet_cidr_block }}"
+      az: "{{ public_subnet_az }}"
+      vpc_id: "{{ vpc.vpc.id }}"
+      region: "{{ vpc_region }}"
+      resource_tags:
+        Name: "{{ public_subnet_name }}"
+  register: public_subnet
+
+
+# Create a route table for the public subnet
+- name: Create route table for public subnet
+  ec2_vpc_route_table:
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      region: "{{ vpc_region }}"
+      vpc_id: "{{ vpc.vpc.id }}"
+      tags:
+        Name: "{{ routeTableName }}"
+      subnets:
+        - "{{ public_subnet.subnet.id }}"
+      routes:
+        - dest: 0.0.0.0/0
+          gateway_id: "{{ vpc_igw.gateway_id }}"
+  register: rt_ansibleVPC_PublicSubnet
+

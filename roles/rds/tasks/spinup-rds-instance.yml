@@ -1,0 +1,34 @@
+# Create the subnet group with the three private subnets
+- name: RDS Subnet group
+  community.aws.rds_subnet_group:
+    name: "StrapiDBSubnetGroup"
+    description: "SubnetGroup for Strapi DB"
+    state: present
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    subnets:
+      - "{{ hostvars['localhost'].vpc_subnet_ids['private-a'] }}"
+      - "{{ hostvars['localhost'].vpc_subnet_ids['private-b'] }}"
+      - "{{ hostvars['localhost'].vpc_subnet_ids['private-c'] }}"
+  register: subnet_group
+
+
+# Create the RDS instance
+- name: Spinup RDS instance
+  community.aws.rds_instance:
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      master_username: "{{ username }}"
+      master_user_password: "{{ password }}"
+      engine: "{{ db_engine }}"
+      allocated_storage: "{{ db_size }}"
+      region: "{{ rds_region }}"
+      db_subnet_group_name: "{{ subnet_group.subnet_group.name }}"
+      db_name: "{{ db_name }}"
+      port: "{{ db_port }}"
+      auto_minor_version_upgrade: "{{ minor_updates }}"
+      allow_major_version_upgrade: "{{ major_updates }}"
+      db_instance_class: "{{ instance_type }}"
+      db_instance_identifier: "{{ instance_name }}"
+      vpc_security_group_ids: "{{ aws_sg_rds.group_id }}"
+  register: rds

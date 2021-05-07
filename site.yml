@@ -1,0 +1,7 @@
+#!/usr/bin/env ansible-playbook
+ 
+# First provision everything on AWS
+- import_playbook: ./playbooks/aws_provisioning.yml 
+
+# Second install all dependencies for Strapi, install Strapi itself and finally configure it
+- import_playbook: ./playbooks/strapi.yml 

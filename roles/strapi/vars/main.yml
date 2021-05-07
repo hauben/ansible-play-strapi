@@ -1,0 +1,3 @@
+---
+# vars file for strapi"
+regex: "'ADMIN_JWT_SECRET',.'([0-9a-zA-Z]+)'"
