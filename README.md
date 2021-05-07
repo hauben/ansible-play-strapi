@@ -3,7 +3,7 @@ Ansible Play Strapi
 
 ## **About:** 
 Playbooks and roles to deploy the headless CMS Strapi (strapi.io) on Amazon AWS.
-For a detailed tutorial have a look at my Medium.com story [Using Ansible For Automatic Deployment Of A Strapi CMS To Amazon AWS](https://medium.com/p/4ac3e7dc8d4d/edit)
+For a detailed tutorial have a look at my Medium.com story [Using Ansible For Automatic Deployment Of A Strapi CMS To Amazon AWS](https://haubenschild.medium.com/automate-your-amazon-aws-deployment-of-your-strapi-based-project-with-ansible-4ac3e7dc8d4d)
 
 This Ansible play include roles for:
  - VPC
@@ -15,7 +15,7 @@ This Ansible play include roles for:
 ## **Details:**
 This play spins up a VPC and create private and public subnets. On RDS a database instance gets created. This instance will be placed into a subnet group of three private subnets allowing failover switches into another region in case of data center fail-outs. An EC2 instance gets created where Strapi will be installed and placed in a public subnet. This public subnet will be accessible from the internet. Because the database must only be accessible from the EC2 instance and not from the outside world it is good practice to have it decoupled from the internet.
 
-![alt text](https://cdn-images-1.medium.com/max/800/1*BDKeLYJZAktuBR3m1T0EtQ.jpeg)
+![alt text](https://miro.medium.com/max/700/1*BDKeLYJZAktuBR3m1T0EtQ.jpeg)
 
 ## **Get Started:**
 
