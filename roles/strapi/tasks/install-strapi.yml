@@ -1,6 +1,6 @@
 # Install the Strapi backend via creating a Strapi app
 - name: Install strapi via CLI
-  ansible.builtin.command: npx create-strapi-app {{ strapi_project_name }} --dbclient {{ db_engine }} --dbport {{ db_port }} --dbname {{ db_name }} --dbhost {{ hostvars['localhost'].rds.endpoint.address }} --dbusername {{ username }} --dbpassword {{ password }}
+  ansible.builtin.command: npx create-strapi-app {{ strapi_project_name }} --quickstart --dbclient {{ db_engine }} --dbport {{ db_port }} --dbname {{ db_name }} --dbhost {{ hostvars['localhost'].rds.endpoint.address }} --dbusername {{ username }} --dbpassword {{ password }}
   become: true
   become_user: "{{ user }}"
   args:
